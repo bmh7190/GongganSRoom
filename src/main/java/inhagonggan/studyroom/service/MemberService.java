@@ -1,6 +1,7 @@
 package inhagonggan.studyroom.service;
 
 import inhagonggan.studyroom.entity.Member;
+import inhagonggan.studyroom.entity.Role;
 import inhagonggan.studyroom.repository.MemberRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class MemberService {
 
         // 비밀번호 암호화
         member.setPassword(passwordEncoder.encode(member.getPassword()));
+        member.setRole(Role.USER);
 
         // 회원 저장
         memberRepository.save(member);

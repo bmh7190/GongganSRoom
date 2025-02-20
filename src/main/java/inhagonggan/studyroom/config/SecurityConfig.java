@@ -28,10 +28,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/admin/**").hasRole("ADMIN") // ✅ 관리자 전용 페이지 보호
-                        .requestMatchers("/members/join", "/login").permitAll() // ✅ 회원가입, 로그인은 누구나 접근 가능
+                        .requestMatchers("/register", "/login").permitAll() // ✅ 회원가입, 로그인은 누구나 접근 가능
                         .anyRequest().authenticated() // ✅ 나머지 요청은 로그인 필요
                 )
                 .formLogin(login -> login
+                        .loginPage("/login")
                         .successHandler((request, response, authentication) -> {
                             if (authentication.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"))) {
                                 response.sendRedirect("/admin"); // ✅ 관리자 로그인 후 이동
