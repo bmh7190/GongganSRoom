@@ -2,6 +2,7 @@ package inhagonggan.studyroom.controller;
 
 import inhagonggan.studyroom.entity.Member;
 import inhagonggan.studyroom.entity.Reservation;
+import inhagonggan.studyroom.entity.ReservationSlotInfo;
 import inhagonggan.studyroom.entity.StudyRoom;
 import inhagonggan.studyroom.service.MemberService;
 import inhagonggan.studyroom.service.ReservationService;
@@ -12,7 +13,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -28,38 +32,56 @@ public class HomeController {
         this.memberService = memberService;
     }
 
+//    @GetMapping("/")
+//    public String home(Model model, @AuthenticationPrincipal User user) {
+//        List<StudyRoom> studyRooms = studyRoomService.getAllRooms();
+//        model.addAttribute("studyRooms", studyRooms);
+//
+//        if (user != null) {
+//            model.addAttribute("userName", user.getUsername());
+//        } else {
+//            model.addAttribute("userName", "게스트");
+//        }
+//
+//        return "home"; // ✅ `home.html`로 이동
+//    }
+//
+//    @PostMapping("/reservations")
+//    public String reserveStudyRoom(@RequestParam Long roomId,
+//                                   @RequestParam String startTime,
+//                                   @RequestParam String endTime,
+//                                   @AuthenticationPrincipal User user) {
+//
+//        Member member = memberService.findByNumber(user.getUsername())
+//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+//
+//        StudyRoom studyRoom = studyRoomService.findById(roomId)
+//                .orElseThrow(() -> new IllegalArgumentException("스터디룸을 찾을 수 없습니다."));
+//
+//        LocalDateTime start = LocalDateTime.parse(startTime);
+//        LocalDateTime end = LocalDateTime.parse(endTime);
+//
+//        reservationService.addReservation(member, studyRoom, start, end );
+//
+//        return "redirect:/";
+//    }
+
     @GetMapping("/")
-    public String home(Model model, @AuthenticationPrincipal User user) {
-        List<StudyRoom> studyRooms = studyRoomService.getAllRooms();
-        model.addAttribute("studyRooms", studyRooms);
+    public String showHome(Model model) {
+        // 오늘 날짜 기준
+        LocalDate targetDate = LocalDate.now();
 
-        if (user != null) {
-            model.addAttribute("userName", user.getUsername());
-        } else {
-            model.addAttribute("userName", "게스트");
-        }
+        // Service에서 모든 로직 처리 후 DTO/VO 등으로 받음
+        ReservationSlotInfo slotInfo = reservationService.getReservationSlotInfo(targetDate);
 
-        return "home"; // ✅ `home.html`로 이동
-    }
+        // 모델에 추가
+        model.addAttribute("rooms", slotInfo.getRooms());
+        model.addAttribute("timeSlots", slotInfo.getTimeSlots());
+        model.addAttribute("reservedSlotsMap", slotInfo.getReservedSlotsMap());
+        model.addAttribute("targetDate", slotInfo.getTargetDate());
+        model.addAttribute("userName", "홍길동");
 
-    @PostMapping("/reservations")
-    public String reserveStudyRoom(@RequestParam Long roomId,
-                                   @RequestParam String startTime,
-                                   @RequestParam String endTime,
-                                   @AuthenticationPrincipal User user) {
-
-        Member member = memberService.findByNumber(user.getUsername())
-                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
-        StudyRoom studyRoom = studyRoomService.findById(roomId)
-                .orElseThrow(() -> new IllegalArgumentException("스터디룸을 찾을 수 없습니다."));
-
-        LocalDateTime start = LocalDateTime.parse(startTime);
-        LocalDateTime end = LocalDateTime.parse(endTime);
-
-        reservationService.addReservation(member, studyRoom, start, end );
-
-        return "redirect:/";
+        return "home"; // home.html
     }
 
 

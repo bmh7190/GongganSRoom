@@ -38,6 +38,8 @@ public class AdminController {
         return "admin/memberList";
     }
 
+
+
     @GetMapping("/studyrooms")
     public String manageStudyRooms(Model model) {
         model.addAttribute("studyRooms", studyRoomService.getAllRooms());

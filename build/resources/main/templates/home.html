@@ -1,57 +1,85 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>스터디룸 예약 시스템</title>
+  <title>스터디룸 예약 시스템 (슬롯)</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen">
 
-<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl">
+<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-5xl">
   <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">스터디룸 예약</h1>
 
-  <p class="text-lg text-center text-gray-600 mb-4" th:text="'환영합니다, ' + ${userName} + '님!'"></p>
+  <p class="text-lg text-center text-gray-600 mb-4"
+     th:text="'환영합니다, ' + ${userName} + '님!'">
+  </p>
 
-  <h2 class="text-xl font-semibold text-gray-700 mb-4">스터디룸 목록</h2>
+  <!-- 날짜 표시 (오늘 날짜) -->
+  <div class="text-center text-gray-600 mb-4"
+       th:text="'날짜: ' + ${targetDate}">
+  </div>
 
-  <table class="w-full border-collapse border border-gray-300">
-    <thead>
-    <tr class="bg-blue-500 text-white">
-      <th class="border border-gray-300 px-4 py-2">방 이름</th>
-      <th class="border border-gray-300 px-4 py-2">최대 인원</th>
-      <th class="border border-gray-300 px-4 py-2">예약</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="room : ${studyRooms}" class="text-center bg-gray-50 even:bg-white">
-      <td class="border border-gray-300 px-4 py-2" th:text="${room.name}"></td>
-      <td class="border border-gray-300 px-4 py-2" th:text="${room.capacity}"></td>
-      <td class="border border-gray-300 px-4 py-2">
-        <form th:action="@{/reservations}" method="post" class="space-y-2">
-          <input type="hidden" name="roomId" th:value="${room.id}">
-          <label class="block text-gray-700">시작 시간:
-            <input type="datetime-local" name="startTime" required
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          </label>
-          <label class="block text-gray-700">종료 시간:
-            <input type="datetime-local" name="endTime" required
-                   class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-400">
-          </label>
-          <button type="submit"
-                  class="w-full bg-green-500 text-white py-2 rounded-lg shadow-md hover:bg-green-600">
-            예약하기
-          </button>
-        </form>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+  <!-- TimeSlot 표 (세로 방향으로 변경) -->
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse border border-gray-300">
+      <thead>
+      <tr class="bg-blue-500 text-white">
+        <!-- 첫 열: 시간 슬롯 -->
+        <th class="border border-gray-300 px-4 py-2">시간</th>
+        <!-- 방 이름 헤더 -->
+        <th th:each="room : ${rooms}"
+            class="border border-gray-300 px-4 py-2"
+            th:text="${room.name}">
+        </th>
+      </tr>
+      </thead>
+      <tbody>
+
+      <tr th:each="slot : ${timeSlots}" class="text-center bg-gray-50 even:bg-white">
+        <!-- 시간 슬롯 -->
+        <td class="border border-gray-300 px-4 py-2 font-bold" th:text="${slot}"></td>
+
+        <!-- 각 방별 예약 여부 -->
+        <td th:each="room : ${rooms}" class="border border-gray-300 px-4 py-2">
+
+          <!-- 예약 여부 확인 -->
+          <div th:if="${#lists.contains(reservedSlotsMap[room.id], slot)}"
+               class="bg-red-200 text-red-600 font-semibold p-1 rounded">
+            예약됨
+          </div>
+
+          <div th:if="${not #lists.contains(reservedSlotsMap[room.id], slot)}"
+               class="bg-green-100 p-1 rounded">
+            <!-- 예약 버튼 폼 -->
+            <form th:action="@{/reservations}" method="post">
+              <input type="hidden" name="roomId" th:value="${room.id}"/>
+              <input type="hidden" name="startTime"
+                     th:value="${targetDate} + 'T' + ${slot}"/>
+              <input type="hidden" name="endTime"
+                     th:value="${targetDate} + 'T' + ${slot.plusMinutes(30)}"/>
+              <button type="submit"
+                      class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                예약
+              </button>
+            </form>
+          </div>
+
+        </td>
+      </tr>
+
+      </tbody>
+    </table>
+  </div>
 
   <div class="mt-6 text-center">
     <a th:href="@{/logout}"
-       class="text-gray-600 hover:text-gray-800 text-sm border border-gray-300 rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition">
+       class="text-gray-600 hover:text-gray-800 text-sm border border-gray-300
+              rounded-lg px-4 py-2 bg-gray-200 hover:bg-gray-300 transition">
       로그아웃
     </a>
   </div>
+
+
+
 </div>
 
 </body>
