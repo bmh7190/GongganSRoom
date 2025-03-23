@@ -4,32 +4,34 @@
   <title>예약 목록</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+<body class="min-h-screen bg-gradient-to-br from-gray-100 to-blue-100 flex items-center justify-center p-4">
 
-<div class="bg-white shadow-lg rounded-lg p-8 w-full max-w-4xl">
-  <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">예약 목록</h1>
+<div class="bg-white shadow-2xl rounded-2xl p-6 sm:p-8 w-full max-w-5xl overflow-x-auto">
+  <h1 class="text-xl sm:text-2xl font-bold text-center text-gray-800 mb-6">📋 예약 목록</h1>
 
-  <table class="w-full border-collapse border border-gray-300">
+  <table class="min-w-full table-auto border border-gray-300 text-sm sm:text-base">
     <thead>
-    <tr class="bg-blue-500 text-white">
-      <th class="border border-gray-300 px-4 py-2">회원 학번</th>
-      <th class="border border-gray-300 px-4 py-2">스터디룸</th>
-      <th class="border border-gray-300 px-4 py-2">시작 시간</th>
-      <th class="border border-gray-300 px-4 py-2">종료 시간</th>
+    <tr class="bg-blue-500 text-white text-center">
+      <th class="px-4 py-3 border">회원 학번</th>
+      <th class="px-4 py-3 border">스터디룸</th>
+      <th class="px-4 py-3 border">시작 시간</th>
+      <th class="px-4 py-3 border">종료 시간</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="reservation : ${reservations}" class="text-center bg-gray-50 even:bg-white">
-      <td class="border border-gray-300 px-4 py-2" th:text="${reservation.member.number}"></td>
-      <td class="border border-gray-300 px-4 py-2" th:text="${reservation.studyRoom.name}"></td>
-      <td class="border border-gray-300 px-4 py-2" th:text="${#temporals.format(reservation.startTime, 'yyyy-MM-dd HH:mm')}"></td>
-      <td class="border border-gray-300 px-4 py-2" th:text="${#temporals.format(reservation.endTime, 'yyyy-MM-dd HH:mm')}"></td>
+    <tr th:each="reservation : ${reservations}" class="text-center even:bg-gray-50">
+      <td class="px-4 py-2 border" th:text="${reservation.member.number}"></td>
+      <td class="px-4 py-2 border" th:text="${reservation.studyRoom.name}"></td>
+      <td class="px-4 py-2 border" th:text="${#temporals.format(reservation.startTime, 'yyyy-MM-dd HH:mm')}"></td>
+      <td class="px-4 py-2 border" th:text="${#temporals.format(reservation.endTime, 'yyyy-MM-dd HH:mm')}"></td>
     </tr>
     </tbody>
   </table>
 
-  <div class="mt-6 text-center">
-    <a th:href="@{/admin}" class="text-gray-600 hover:text-gray-800 text-sm">← 뒤로가기</a>
+  <div class="mt-8 text-center">
+    <a th:href="@{/admin}" class="inline-block text-sm text-blue-600 hover:text-white border border-blue-300 bg-blue-100 hover:bg-blue-500 rounded-full px-5 py-2 transition">
+      ← 관리자 홈으로
+    </a>
   </div>
 </div>
 

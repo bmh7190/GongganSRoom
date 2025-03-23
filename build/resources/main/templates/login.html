@@ -1,42 +1,69 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <title>로그인</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;700;900&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Noto Sans KR"', 'sans-serif'],
+                        dohyeon: ['"Do Hyeon"', 'sans-serif'],
+                        nanum: ['"Nanum Gothic"', 'sans-serif'],
+                        gowun: ['"Gowun Dodum"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<div class="bg-white p-8 rounded-lg shadow-lg w-96">
-    <h2 class="text-2xl font-bold text-center text-gray-800 mb-6">로그인</h2>
+<body class="min-h-screen bg-gradient-to-br from-blue-100 to-purple-200 flex flex-col items-center justify-center font-sans p-4">
+
+
+<!-- 로그인 박스 -->
+<div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-sm transform transition-all duration-300">
+    <h2 class="text-3xl font-extrabold text-center text-gray-800 mb-6 font-sans">스터디룸 로그인</h2>
 
     <!-- 에러 메시지 출력 -->
     <div th:if="${param.error}" class="text-red-500 text-sm text-center mb-4">
         아이디 또는 비밀번호가 잘못되었습니다.
     </div>
 
-    <form th:action="@{/login}" method="post">
+    <form th:action="@{/login}" method="post" class="space-y-4">
         <!-- 아이디 입력 -->
-        <div class="mb-4">
-            <label class="block text-gray-700">학번</label>
-            <input type="text" name="username" required
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <div>
+            <label class="block text-gray-600 mb-1">학번</label>
+            <div class="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <input type="text" name="username" required
+                       class="w-full bg-transparent focus:outline-none text-gray-800">
+            </div>
         </div>
 
         <!-- 비밀번호 입력 -->
-        <div class="mb-4">
-            <label class="block text-gray-700">비밀번호</label>
-            <input type="password" name="password" required
-                   class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400">
+        <div>
+            <label class="block text-gray-600 mb-1">비밀번호</label>
+            <div class="flex items-center border rounded-lg px-3 py-2 bg-gray-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-gray-400 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0-1.104-.896-2-2-2s-2 .896-2 2v2h4v-2zm0 0h4v2h-4z" />
+                </svg>
+                <input type="password" name="password" required
+                       class="w-full bg-transparent focus:outline-none text-gray-800">
+            </div>
         </div>
 
         <!-- 로그인 버튼 -->
         <button type="submit"
-                class="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600">
+                class="w-full py-2 rounded-lg bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-semibold shadow hover:shadow-lg hover:brightness-110 transition">
             로그인
         </button>
     </form>
-
-
 </div>
 
 </body>
