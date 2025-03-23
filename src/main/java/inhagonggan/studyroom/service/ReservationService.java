@@ -49,35 +49,31 @@ public class ReservationService {
         return reservations;
     }
 
-    // 예약 업데이트
-
-
     // 예약 취소
-    public void deleteReservation(Long id){
-            reservationRepository.findById(id).orElseThrow(()->
+    public void deleteReservation(Long id, Member user){
+        Reservation reservation = reservationRepository.findById(id).orElseThrow(()->
                     new IllegalArgumentException("해당 예약이 존재하지 않습니다"));
+
+        if(!reservation.getMember().getId().equals(user.getId())){
+            throw new IllegalStateException("본인의 예약만 취소할 수 있습니다.");
+        }
+        reservationRepository.delete(reservation);
     }
 
-    public void addReservation(Reservation reservation) {
-    }
+
 
     public ReservationSlotInfo getReservationSlotInfo(LocalDate targetDate) {
-        // 1) 방 목록 조회
-        List<StudyRoom> rooms = studyRoomRepository.findAll();
 
-        // 2) 09:00 ~ 21:00, 30분 단위 슬롯
+        List<StudyRoom> rooms = studyRoomRepository.findAll();
         List<LocalTime> timeSlots = generateTimeSlots(LocalTime.of(9, 0), LocalTime.of(21, 0));
 
-        // 3) 예약된 슬롯 수집
         Map<Long, Set<LocalTime>> reservedSlotsMap = new HashMap<>();
 
-        // ★ 메서드 파라미터로 받은 targetDate 사용
-        LocalDateTime startOfDay = targetDate.atStartOfDay();      // 예) 2025-03-03T00:00
-        LocalDateTime endOfDay   = targetDate.atTime(LocalTime.MAX);// 예) 2025-03-03T23:59:59.999999999
+        LocalDateTime startOfDay = targetDate.atStartOfDay();
+        LocalDateTime endOfDay   = targetDate.atTime(LocalTime.MAX);
 
-        // 각 방마다 예약 조회
         for (StudyRoom room : rooms) {
-            // ★ room.getId() 사용
+
             List<Reservation> reservations = reservationRepository.findReservationsByRoomAndDay(
                     room.getId(), startOfDay, endOfDay
             );
@@ -88,7 +84,6 @@ public class ReservationService {
                 LocalDateTime end   = res.getEndTime();
                 LocalDateTime cur   = start;
 
-                // 30분씩 반복하며 해당 룸이 이미 예약된 timeSlot 수집
                 while (!cur.isAfter(end.minusMinutes(1))) {
                     roomReserved.add(cur.toLocalTime());
                     cur = cur.plusMinutes(30);
@@ -97,11 +92,9 @@ public class ReservationService {
             reservedSlotsMap.put(room.getId(), roomReserved);
         }
 
-        // 결과를 DTO(ReservationSlotInfo)에 담아 반환
         return new ReservationSlotInfo(rooms, timeSlots, reservedSlotsMap, targetDate);
     }
 
-    // 30분 단위 슬롯 생성
     private List<LocalTime> generateTimeSlots(LocalTime start, LocalTime end) {
         List<LocalTime> slots = new ArrayList<>();
         LocalTime cur = start;

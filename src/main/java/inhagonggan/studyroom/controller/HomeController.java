@@ -32,39 +32,25 @@ public class HomeController {
         this.memberService = memberService;
     }
 
-//    @GetMapping("/")
-//    public String home(Model model, @AuthenticationPrincipal User user) {
-//        List<StudyRoom> studyRooms = studyRoomService.getAllRooms();
-//        model.addAttribute("studyRooms", studyRooms);
-//
-//        if (user != null) {
-//            model.addAttribute("userName", user.getUsername());
-//        } else {
-//            model.addAttribute("userName", "게스트");
-//        }
-//
-//        return "home"; // ✅ `home.html`로 이동
-//    }
-//
-//    @PostMapping("/reservations")
-//    public String reserveStudyRoom(@RequestParam Long roomId,
-//                                   @RequestParam String startTime,
-//                                   @RequestParam String endTime,
-//                                   @AuthenticationPrincipal User user) {
-//
-//        Member member = memberService.findByNumber(user.getUsername())
-//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-//
-//        StudyRoom studyRoom = studyRoomService.findById(roomId)
-//                .orElseThrow(() -> new IllegalArgumentException("스터디룸을 찾을 수 없습니다."));
-//
-//        LocalDateTime start = LocalDateTime.parse(startTime);
-//        LocalDateTime end = LocalDateTime.parse(endTime);
-//
-//        reservationService.addReservation(member, studyRoom, start, end );
-//
-//        return "redirect:/";
-//    }
+    @PostMapping("/reservations")
+    public String reserveStudyRoom(@RequestParam Long roomId,
+                                   @RequestParam String startTime,
+                                   @RequestParam String endTime,
+                                   @AuthenticationPrincipal User user) {
+
+        Member member = memberService.findByNumber(user.getUsername())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
+        StudyRoom studyRoom = studyRoomService.findById(roomId)
+                .orElseThrow(() -> new IllegalArgumentException("스터디룸을 찾을 수 없습니다."));
+
+        LocalDateTime start = LocalDateTime.parse(startTime);
+        LocalDateTime end = LocalDateTime.parse(endTime);
+
+        reservationService.addReservation(member, studyRoom, start, end );
+
+        return "redirect:/";
+    }
 
     @GetMapping("/")
     public String showHome(Model model) {

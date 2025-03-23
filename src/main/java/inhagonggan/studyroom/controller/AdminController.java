@@ -38,18 +38,16 @@ public class AdminController {
         return "admin/memberList";
     }
 
-
+    @GetMapping("/reservations")
+    public String getAllReservations(Model model) {
+        model.addAttribute("reservations", reservationService.getAllReservations());
+        return "admin/reservationList";
+    }
 
     @GetMapping("/studyrooms")
     public String manageStudyRooms(Model model) {
         model.addAttribute("studyRooms", studyRoomService.getAllRooms());
         return "admin/studyRoomList";
-    }
-
-    @GetMapping("/reservations")
-    public String getAllReservations(Model model) {
-        model.addAttribute("reservations", reservationService.getAllReservations());
-        return "admin/reservationList";
     }
 
     @PostMapping("/studyrooms")
