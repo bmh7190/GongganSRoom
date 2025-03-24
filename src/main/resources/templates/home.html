@@ -18,8 +18,8 @@
 </head>
 <body class="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 flex items-center justify-center p-4 sm:p-6">
 
-<div class="bg-white shadow-2xl rounded-xl p-6 sm:p-8 md:p-10 w-full max-w-6xl transition-all duration-300 overflow-x-auto">
-  <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-center text-gray-800 mb-4 sm:mb-6 font-sans">스터디룸 예약 시스템</h1>
+<div class="bg-white shadow-2xl rounded-xl p-6 sm:p-8 md:p-10 w-full max-w-6xl transition-all duration-300 overflow-x-auto font-sans">
+  <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-center text-gray-800 mb-4 sm:mb-6">스터디룸 예약 시스템</h1>
 
   <p class="text-sm sm:text-base md:text-lg text-center text-gray-700 mb-1"
      th:text="'👋 환영합니다, ' + ${userName} + '님!'">
@@ -29,50 +29,67 @@
        th:text="'📅 날짜: ' + ${targetDate}">
   </div>
 
-  <div class="overflow-x-auto rounded-lg">
-    <table class="min-w-full table-fixed border border-gray-300 shadow-sm bg-white text-xs sm:text-sm md:text-base">
-      <thead>
-      <tr class="bg-indigo-500 text-white text-center">
-        <th class="px-2 sm:px-4 py-2 border w-24 sm:w-1/6">시간</th>
-        <th th:each="room : ${rooms}" class="px-2 sm:px-4 py-2 border" th:text="${room.name}"></th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr th:each="slot : ${timeSlots}" class="text-center">
-        <td class="border px-2 sm:px-4 py-2 font-semibold bg-gray-50" th:text="${slot}"></td>
+  <table class="min-w-full table-fixed border border-gray-300 shadow-sm bg-white text-xs sm:text-sm md:text-base">
+    <thead>
+    <tr class="bg-indigo-500 text-white text-center">
+      <th class="px-2 sm:px-4 py-2 border w-24 sm:w-1/6">시간</th>
+      <th th:each="room : ${rooms}" class="px-2 sm:px-4 py-2 border" th:text="${room.name}"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="slot : ${timeSlots}" class="text-center">
+      <td class="border px-2 sm:px-4 py-2 font-semibold bg-gray-50" th:text="${slot}"></td>
 
-        <td th:each="room : ${rooms}" class="border px-2 sm:px-4 py-2">
-          <!-- 예약된 슬롯 -->
-          <div th:if="${#lists.contains(reservedSlotsMap[room.id], slot)}"
-               class="bg-red-100 text-red-600 font-semibold px-2 py-1 rounded flex items-center justify-center gap-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M6 18L18 6M6 6l12 12"/>
-            </svg>
-            예약됨
+      <td th:each="room : ${rooms}" class="border px-2 sm:px-4 py-2">
+
+        <!-- 버튼 공통 Wrapper -->
+        <div class="flex justify-center items-center bg-opacity-10 bg-red-100 rounded py-1 px-1"
+             th:if="${#lists.contains(reservedSlotsMap[room.id], slot)}">
+
+          <div class="w-[120px]">
+            <!-- 내가 예약한 경우: 예약 취소 -->
+            <button type="button"
+                    th:if="${reservationMap.containsKey(room.id.toString() + slot.toString())
+                  and reservationMap[room.id.toString() + slot.toString()].member.number == userNumber}"
+                    th:onclick="'openCancelModal(' + ${reservationMap[room.id.toString() + slot.toString()].id} + ')'"
+                    class="w-full bg-red-500 text-white text-xs sm:text-sm py-1 rounded shadow hover:bg-red-600 transition text-center">
+              예약취소
+            </button>
+
+            <!-- 다른 사람 예약 -->
+            <button type="button"
+                    th:if="${!(reservationMap.containsKey(room.id.toString() + slot.toString())
+                  and reservationMap[room.id.toString() + slot.toString()].member.number == userNumber)}"
+                    disabled
+                    class="w-full bg-red-500 text-white text-xs sm:text-sm py-1 rounded shadow opacity-80 cursor-not-allowed text-center">
+              예약됨
+            </button>
           </div>
+        </div>
 
-          <!-- 예약 가능한 슬롯 -->
-          <div th:if="${not #lists.contains(reservedSlotsMap[room.id], slot)}"
-               class="bg-green-50 px-2 py-1 rounded flex items-center justify-center">
-            <form th:action="@{/reservations}" method="post">
+        <!-- 예약 가능 -->
+        <div class="flex justify-center items-center bg-opacity-10 bg-green-100 rounded py-1 px-1"
+             th:if="${not #lists.contains(reservedSlotsMap[room.id], slot)}">
+
+          <div class="w-[120px]">
+            <form th:action="@{/reservations}" method="post" class="w-full">
               <input type="hidden" name="roomId" th:value="${room.id}"/>
-              <input type="hidden" name="startTime"
-                     th:value="${targetDate} + 'T' + ${slot}"/>
-              <input type="hidden" name="endTime"
-                     th:value="${targetDate} + 'T' + ${slot.plusMinutes(30)}"/>
+              <input type="hidden" name="startTime" th:value="${targetDate} + 'T' + ${slot}"/>
+              <input type="hidden" name="endTime" th:value="${targetDate} + 'T' + ${slot.plusMinutes(30)}"/>
               <button type="submit"
-                      class="bg-green-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded hover:bg-green-600 transition-all">
+                      class="w-full bg-green-500 text-white text-xs sm:text-sm py-1 rounded shadow hover:bg-green-600 transition text-center">
                 예약
               </button>
             </form>
           </div>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
+        </div>
+
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+
 
   <div class="mt-6 text-center">
     <a th:href="@{/logout}"
@@ -82,6 +99,34 @@
     </a>
   </div>
 </div>
+
+<!-- ✅ 모달: 예약 취소 확인 -->
+<div id="cancelModal" class="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center hidden z-50">
+  <div class="bg-white rounded-xl shadow-lg p-6 w-80 text-center space-y-4">
+    <p class="text-lg font-semibold text-gray-800">정말 예약을 취소하시겠습니까?</p>
+    <form id="cancelForm" th:action="@{/reservations/delete}" method="post">
+      <input type="hidden" name="reservationId" id="cancelReservationId"/>
+      <div class="flex justify-between gap-4 mt-4">
+        <button type="button" onclick="closeModal()"
+                class="flex-1 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded">아니요</button>
+        <button type="submit"
+                class="flex-1 py-2 bg-red-500 hover:bg-red-600 text-white rounded">네, 취소할게요</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ✅ JavaScript -->
+<script>
+  function openCancelModal(reservationId) {
+    document.getElementById('cancelReservationId').value = reservationId;
+    document.getElementById('cancelModal').classList.remove('hidden');
+  }
+
+  function closeModal() {
+    document.getElementById('cancelModal').classList.add('hidden');
+  }
+</script>
 
 </body>
 </html>
