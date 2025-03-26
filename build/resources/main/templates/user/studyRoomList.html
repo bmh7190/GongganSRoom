@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>스터디룸 예약</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+<h1>스터디룸 목록</h1>
+
+<table border="1">
+    <tr>
+        <th>방 이름</th>
+        <th>최대 인원</th>
+        <th>예약</th>
+    </tr>
+    <tr th:each="room : ${studyRooms}">
+        <td th:text="${room.name}"></td>
+        <td th:text="${room.capacity}"></td>
+        <td>
+            <form th:action="@{/user/reservations}" method="post">
+                <input type="hidden" name="roomId" th:value="${room.id}">
+                <button type="submit">예약하기</button>
+            </form>
+        </td>
+    </tr>
+</table>
+
+<a th:href="@{/home}">← 홈으로</a>
+</body>
+</html>
